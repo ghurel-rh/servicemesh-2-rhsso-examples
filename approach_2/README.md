@@ -16,7 +16,14 @@ HTTP/1.1 200 OK
 ```
 
 ## Injecting oauth2-proxy container inside the Istio Ingress Gateway pod
-First, replace `<CLUSTERNAME>` and `<BASEDOMAIN>` with the appropriate values in `01_patch-istio-ingressgateway-deploy.yaml`.
+First, ensure that `<CLUSTERNAME>` and `<BASEDOMAIN>` have been replaced with the appropriate values in `01_patch-istio-ingressgateway-deploy.yaml` (this has been done during the prerequisites phase).
+
+Also, ensure the argument `--client-secret` inside the YAML file matches the secret of the istio client in RHSSO (see prerequisites).
+```
+# Check the client secret
+$ cat 01_patch-istio-ingressgateway-deploy.yaml | grep 'client-secret'
+```
+
 Then, patch the Istio Ingress Gateway deployment:
 ```
 $ oc patch deploy istio-ingressgateway -n istio-system --patch "$(cat 01_patch-istio-ingressgateway-deploy.yaml)"
@@ -47,5 +54,5 @@ route.route.openshift.io/istio-ingressgateway patched
 ```
 
 ## Test the OIDC redirection workflow to access bookinfo
-In a browser, open https://istio-ingressgateway-istio-system.apps.<CLUSTERNAME>.<BASEDOMAIN>/productpage .
+In a browser, in a private navigation mode, open https://istio-ingressgateway-istio-system.apps.<CLUSTERNAME>.<BASEDOMAIN>/productpage .
 You are redirected to our RHSSO, and if you authenticate using `localuser:localuser` you are then successfully redirected to the `bookinfo` application.
