@@ -1,5 +1,14 @@
 # Prerequisites
 
+## Adapt the YAML files to match cluster name and base domain
+
+Assuming your cluster API FQDN is `api.myocp.my.domain.com`:
+
+```
+$ find . -type f -name "*.yaml" |xargs sed -i 's@<CLUSTERNAME>@myocp@g'
+$ find . -type f -name "*.yaml" |xargs sed -i 's@<BASEDOMAIN>@my.domain.com@g'
+```
+
 ## Install Service Mesh 2.0
 
 You can follow [the official documentation for Service Mesh 2.0](https://docs.openshift.com/container-platform/4.6/service_mesh/v2x/installing-ossm.html) until the section [Deploying the control plane from the web console](https://docs.openshift.com/container-platform/4.6/service_mesh/v2x/installing-ossm.html#ossm-control-plane-deploy-operatorhub_installing-ossm). When creating the `ServiceMeshControlPlane` object, you can leave all the fields to their default values.
@@ -41,7 +50,7 @@ oc apply -f 02_servicemesh-realm.yaml
 
 Note:
 * the field `secret` is set randomly and you can leave as it is (we'll used this secret later);
-* adapt the line `redirectUris` to match the route of the default Istio ingress gateway (`oc get route istio-ingressgateway -n istio-system`); even if this route is currently using `http`, leave `https` in the `redirectUris` field (the route will be patched later in approach 2 and 3);
+* even if the route matching the `redirectUris` is currently using `http` (the route of the Istio default ingress gateway), leave `https` in the `redirectUris` field (the route will be patched later in approach 2 and 3);
 ``` 
 $ oc apply -f 03_istio-client.yaml
 ```
