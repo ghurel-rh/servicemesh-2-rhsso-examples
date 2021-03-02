@@ -64,7 +64,9 @@ $ oc get secret credential-rhsso-simple --template={{.data.ADMIN_PASSWORD}} -n r
 $ oc get route keycloak -n rhsso
 ```
 Open the route in a browser (don't forget `https://`) and login using the user `admin` and the above password. 
-Then, select the realm `servicemesh-lab` (top left of the window), click on `Clients` in the left menu, then `istio` and ensure that the `Access Type` value is set to `confidential`. If not, set it, and click on the button `Save` at the bottom of the page. A new "Credentials" tab has appeared at the top of the page, and you can check in this tab that the client secret is matching the value set in `03_istio-client.yaml` (if not, simply use the new value).
+Then, select the realm `servicemesh-lab` (top left of the window), click on `Clients` in the left menu, then `istio`:
+* ensure `Standard Flow Enabled` is enabled for this client;
+* ensure that the `Access Type` value is set to `confidential`; if not, set it, click on the button `Save` at the bottom of the page; a new "Credentials" tab has appeared at the top of the page, and you can check in this tab that the client secret is matching the value set in `03_istio-client.yaml` (if not, simply use the new value).
 
 6. Create the local user `localuser:localuser` inside the realm `servicemesh-lab`.
 Note:
