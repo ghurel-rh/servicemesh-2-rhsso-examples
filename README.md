@@ -19,7 +19,7 @@ For the sake of simplicity, it is better to delete and re-create the istio contr
 * have a RHSSO platform inside the cluster deployed using the RHSSO operator
 * have bookinfo service mesh application example deployed 
 
-## Approach 1: Using Istio RequestAuthentication and AuthorizationPolicy Custom Resources
+## Approach 1: Using Istio native mechanisms for JWT-based authorization
 
 In this approach, access to the `bookinfo` application is restricted using Istio-related CRD [RequestAuthentication](https://istio.io/latest/docs/reference/config/security/request_authentication/) and [AuthorizationPolicy](https://istio.io/latest/docs/reference/config/security/authorization-policy/) deployed in the cluster. A user can access the application by providing a JWT token in its HTTP request (through the HTTP Header `Authorization`).
 
@@ -41,7 +41,7 @@ The workflow is as follows:
 * no OIDC workflow: the user must get a JWT token on its own, and pass it with the HTTP request on its own
 * need to define `RequestAuthentication` and `AuthorizationPolicy` objects for each application to protect inside the service mesh
 
-## Approach 2: Injecting oauth2-proxy container inside the default Istio ingress gateway
+## Approach 2: Injecting oauth2-proxy container inside the Istio ingress gateway to implement an OIDC workflow
 
 In this approach, access to the `bookinfo` application is restricted by injecting an oauth2-proxy sidecar container to the Istio ingress gateway. The oauth2-proxy will enforce user authentication with RHSSO before forwarding any request to the istio-proxy (the default container of the Istio ingress gateway). In this approach, the OIDC workflow between the user, oauth2-proxy and RHSSO is perfomed automatically. 
 
@@ -64,7 +64,7 @@ The workflow is as follows:
 * coarse-grained authorization (authenticated == authorized)
 * complex setup (involve patches)
 
-## Approach 3: Best of both world
+## Approach 3: Combining JWT-based authorization and OIDC workflow
 
 This approach combines the use of `RequestAuthentication` and `AuthorizationPolicy` objects as done for approach 1, and the injection of the oauth2-proxy container as done in the approach 2. In this approach, the oauth2-proxy container extracts the JWT token from the authentication cookie, and forwards it to the istio-proxy container alongside the HTTP request (using the `X-Forwarded-Access-Token` HTTP header). As a result, an automated OIDC workflow to authenticate the user is performed, and can be, if needed, combined to a fine-grained authorization based on JWT token fields (e.g. simple auth for 'non-secure' apps, auth + JWT field for more secure apps).
 
@@ -72,7 +72,7 @@ This approach combines the use of `RequestAuthentication` and `AuthorizationPoli
 
 The workflow is as follows:
 
-1. the user performs an unauthenticated HTTP request to `https://<route>/productpage``;
+1. the user performs an unauthenticated HTTP request to `https://<route>/productpage`;
 2. the oauth2-proxy inside the Istio ingress gateway pod initiates the OIDC workflow to authenticate the user; user authenticates to RHSSO (not shown on the picture);
 3. the user performs an authenticated HTTP request to `https://<route>/productpage`; the authentication is checked by the oauth2-proxy using HTTP cookies;
 4. the oauth2-proxy extracts the JWT token from the authentication cookie and forwards it locally (same pod) alongside the HTTP request to the istio-proxy container of the Istio ingress gateway;
