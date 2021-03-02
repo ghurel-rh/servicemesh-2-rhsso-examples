@@ -45,11 +45,11 @@ $ oc apply -f 02_authpolicy_allow_from_servicemesh-lab_realm.yaml -n bookinfo
 
 The created `RequestAuthentication` object tells Istio that only JWT tokens issued by our RHSSO will be used to authenticate/authorize user requests for `bookinfo`.
 
-The created `AuthenticationPolicy` object tells that the JWT token, to be valid, must be issued by our RHSSO and for any user with email address matching `shadowman@redhat.com` or `another@email.com`. During prerequisites phase, we created a user `localuser` inside RHSSO, and this user has the address `shadowman@redhat.com`.
+The created `AuthenticationPolicy` object tells that the JWT token, to be valid, must be issued by our RHSSO and for any user with email address matching `shadowman@redhat.com` or `another@email.com` (see [Istio conditions page](https://istio.io/latest/docs/reference/config/security/conditions/) for more example of conditions). During prerequisites phase, we created a user `localuser` inside RHSSO, and this user has the address `shadowman@redhat.com`.
 
 ## Access bookinfo
 
-First, ensure that you cannot access anymore the `bookinfo` application:
+First, ensure that you cannot access anymore the `bookinfo` application (it might take a few seconds for the changes to apply):
 ```
 $ export GATEWAY_URL=$(oc -n istio-system get route istio-ingressgateway -o jsonpath='{.spec.host}')
 $ curl -I http://$GATEWAY_URL/productpage                                                           
@@ -63,7 +63,7 @@ $ curl -Lk --data "username=localuser&password=localuser&grant_type=password&cli
    | jq .access_token
 ```
 
-Note: the `<CLIENT_SECRET>` must be replaced with the client secret of the RHSSO client created during prerequisites phase.
+Note: the `<CLIENT_SECRET>` must be replaced with the client secret of the RHSSO client created during prerequisites phase (see `prerequisites/README.md` and `prerequisites/yaml/rhsso/03_istio-client.yaml)`.
 
 Finally, use this JWT token to access `bookinfo`:
 ```
