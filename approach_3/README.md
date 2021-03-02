@@ -1,6 +1,6 @@
 # Approach 3
 
-We assume we start from a clean install of both Service Mesh and `bookinfo` application.
+Through not mandatory, for the sake of simplicity we assume we start from a clean install of both Service Mesh and `bookinfo` application (see `prerequisites`).
 
 ## Injecting oauth2-proxy container inside the Istio Ingress Gateway pod
 First, replace `<CLUSTERNAME>` and `<BASEDOMAIN>` with the appropriate values in `01_patch-istio-ingressgateway-deploy.yaml`.
@@ -72,7 +72,7 @@ HTTP/1.1 200 OK
 
 ## Create RequestAuthentication and AuthorizationPolicy for bookinfo
 
-First, replace `<CLUSTERNAME>` and `<BASEDOMAIN>` with the appropriate values. Then apply the two CR:
+First, ensure `<CLUSTERNAME>` and `<BASEDOMAIN>` are replaced with the appropriate values (this has been normally done during the prerequisites step). Then apply the two CR:
 ```
 $ oc apply -f 01_requestauthentication.yaml -n bookinfo
 $ oc apply -f 02_authpolicy_allow_from_servicemesh-lab_realm.yaml -n bookinfo 
@@ -82,13 +82,11 @@ The created `RequestAuthentication` object tells Istio that only JWT tokens issu
 
 Compared to approach 1, the `RequestAuthentication` also tells Istio to look for the JWT tokens in the `x-forwarded-access-token` HTTP header.
 
-The created `AuthenticationPolicy` object tells that the JWT token, to be valid, must be issued by our RHSSO and for any user with email address matching `shadowman@redhat.com` or `another@email.com`. During prerequisites phase, we created a user `localuser` inside RHSSO, and this user has the address `shadowman@redhat.com`.
+The created `AuthenticationPolicy` object tells that the JWT token, to be valid, must be issued by our RHSSO and for any user with email address matching `shadowman@redhat.com` or `another@email.com`(see [Istio conditions page](https://istio.io/latest/docs/reference/config/security/conditions/) for more example of conditions). During prerequisites phase, we created a user `localuser` inside RHSSO, and this user has the address `shadowman@redhat.com`.
 
 
 ## Test the OIDC redirection workflow to access bookinfo
-In a browser, open https://istio-ingressgateway-istio-system.apps.<CLUSTERNAME>.<BASEDOMAIN>/productpage .
+In a browser, in private navigation mode, open https://istio-ingressgateway-istio-system.apps.<CLUSTERNAME>.<BASEDOMAIN>/productpage .
 You are redirected to our RHSSO, and if you authenticate using `localuser:localuser` you are then successfully redirected to the `bookinfo` application.
 
 Now, if you remove the `shadowman@redhat.com` line from the AuthorizationPolicy object (using `oc edit authorizationpolicy authpolicy -n bookinfo`) and try again to access https://istio-ingressgateway-istio-system.apps.<CLUSTERNAME>.<BASEDOMAIN>/productpage with `localuser`, access will be denied.
-
-
