@@ -16,5 +16,6 @@ spec:
     protocol: openid-connect
     publicClient: false
     directAccessGrantsEnabled: true
+    standardFlowEnabled: true
     redirectUris:
       - https://istio-ingressgateway-istio-system.apps.<CLUSTERNAME>.<BASEDOMAIN>/*
