@@ -43,7 +43,7 @@ $ oc apply -f rhsso/01_rhsso.yaml
 
 4. Create the `servicemesh-lab` realm:
 ```
-oc apply -f 02_servicemesh-realm.yaml
+oc apply -f rhsso/02_servicemesh-realm.yaml
 ```
 
 5. Create a client `istio` inside the realm `servicemesh-lab`.
@@ -52,7 +52,7 @@ Note:
 * the field `secret` is set randomly and you can leave as it is (we'll used this secret later);
 * even if the route matching the `redirectUris` is currently using `http` (the route of the Istio default ingress gateway), leave `https` in the `redirectUris` field (the route will be patched later in approach 2 and 3);
 ``` 
-$ oc apply -f 03_istio-client.yaml
+$ oc apply -f rhsso/03_istio-client.yaml
 ```
 Currently, the RHSSO operator does not allow to set the client to `confidential`, so we have to set it manually using the web UI.
 ```
@@ -63,12 +63,13 @@ $ oc get secret credential-rhsso-simple --template={{.data.ADMIN_PASSWORD}} -n r
 # Retrieve the root
 $ oc get route keycloak -n rhsso
 ```
-Open the route in a browser and login using the user `admin` and the above password. Then, select the realm `servicemesh-lab` (top left of the window), click on `Clients` in the left menu, then `istio`, set the `Access Type` to `confidential` and click on the button `Save` at the bottom of the page. A new "Credentials" tab has appeared at the top of the page, and you can check in this tab that the client secret is matching the value set in `03_istio-client.yaml` (if not, simply use the new value).
+Open the route in a browser (don't forget `https://`) and login using the user `admin` and the above password. 
+Then, select the realm `servicemesh-lab` (top left of the window), click on `Clients` in the left menu, then `istio` and ensure that the `Access Type` value is set to `confidential`. If not, set it, and click on the button `Save` at the bottom of the page. A new "Credentials" tab has appeared at the top of the page, and you can check in this tab that the client secret is matching the value set in `03_istio-client.yaml` (if not, simply use the new value).
 
 6. Create the local user `localuser:localuser` inside the realm `servicemesh-lab`.
 Note:
 ```
-$ oc apply -f 04_local-user.yaml
+$ oc apply -f rhsso/04_local-user.yaml
 ```
 
-You can test to login as `localuser` by opening https://keycloak-rhsso.apps.<CLUSTERNAME\>.<BASEDOMAIN\>/auth/realms/servicemesh-lab/account in a browser.
+You can test to login as `localuser:localuser` by opening https://keycloak-rhsso.apps.<CLUSTERNAME\>.<BASEDOMAIN\>/auth/realms/servicemesh-lab/account in a browser.
