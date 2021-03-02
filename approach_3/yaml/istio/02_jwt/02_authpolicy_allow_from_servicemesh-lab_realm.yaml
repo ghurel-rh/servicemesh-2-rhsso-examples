@@ -1,0 +1,19 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: authpolicy
+  namespace: bookinfo
+spec:
+  selector:
+    matchLabels:
+      app: productpage
+  action: ALLOW
+  rules:
+  # https://istio.io/latest/docs/reference/config/security/conditions/
+  - when:
+    - key: request.auth.claims[iss]
+      values: ["https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab"]
+    - key: request.auth.claims[email]
+      values:
+      - shadowman@redhat.com
+      - another@email.com

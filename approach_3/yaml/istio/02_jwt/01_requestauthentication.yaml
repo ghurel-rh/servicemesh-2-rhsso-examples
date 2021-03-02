@@ -1,0 +1,18 @@
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-rhsso
+  namespace: bookinfo
+spec:
+  selector:
+    matchLabels:
+      app: productpage
+  jwtRules:
+  - issuer: >-
+      https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab
+    jwksUri: >-
+      https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab/protocol/openid-connect/certs
+    # Tell istiod to look for the JWT token in the following headers (instead of Authorization)
+    fromHeaders:
+    - name: x-forwarded-access-token
+    - name: X-Forwarded-Access-Token

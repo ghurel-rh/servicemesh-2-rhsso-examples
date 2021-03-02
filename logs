@@ -1,0 +1,65 @@
+Création RequestAuthentication:
+
+istiod-basic pod:
+2021-01-05T15:10:25.824924Z	info	Response Body: {"apiVersion":"security.istio.io/v1beta1","items":[{"apiVersion":"security.istio.io/v1beta1","kind":"RequestAuthentication","metadata":{"annotations":{"kubectl.kubernetes.io/last-applied-configuration":"{\"apiVersion\":\"security.istio.io/v1beta1\",\"kind\":\"RequestAuthentication\",\"metadata\":{\"annotations\":{},\"name\":\"jwt-rhsso\",\"namespace\":\"bookinfo\"},\"spec\":{\"jwtRules\":[{\"issuer\":\"https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab\",\"jwksUri\":\"https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab/protocol/openid-connect/certs\"}],\"selector\":{\"matchLabels\":{\"app\":\"productpage\"}}}}\n"},"creationTimestamp":"2021-01-05T15:10:24Z","generation":1,"managedFields":[{"apiVersion":"security.istio.io/v1beta1","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}},"f:spec":{".":{},"f:jwtRules":{},"f:selector":{".":{},"f:matchLabels":{".":{},"f:app":{}}}}},"manager":"oc","operation":"Update","time":"2021-01-05T15:10:24Z"}],"name":"jwt-rhsso","namespace":"bookinfo","resourceVersion":"541162","selfLink":"/apis/security.istio.io/v1beta1/namespaces/bookinfo/requestauthentications/jwt-rhsso","uid":"2f74b4d3-ed68-47e7-89d7-e372c164c187"},"spec":{"jwtRules":[{"issuer":"https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab","jwksUri":"https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab/protocol/openid-connect/certs"}],"selector":{"matchLabels":{"app":"productpage"}}}}],"kind":"RequestAuthenticationList","metadata":{"continue":"","resourceVersion":"541162","selfLink":"/apis/security.istio.io/v1beta1/namespaces/bookinfo/requestauthentications"}}
+
+
+productpage pod:
+      "issuer": "https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab",
+      "payload_in_metadata": "https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab",
+        "issuer": "https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab"
+   "issuer": "https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab",
+   "payload_in_metadata": "https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab",
+    issuer: "https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab"
+    payload_in_metadata: "https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab"
+2021-01-05T15:11:36.741351Z	debug	envoy jwt	[external/envoy/source/extensions/filters/http/jwt_authn/extractor.cc:168] addHeaderConfig for issuer https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab at authorization
+2021-01-05T15:11:36.741372Z	debug	envoy jwt	[external/envoy/source/extensions/filters/http/jwt_authn/extractor.cc:168] addHeaderConfig for issuer https://keycloak-rhsso.apps.myocp.sandbox1249.opentlc.com/auth/realms/servicemesh-lab at authorization
+
+
+Curl sur bookinfo une fois les requestauth et authpolicy deployées:
+
+logs productpage pod:
+2021-01-05T15:00:26.746415Z	debug	envoy rbac	[external/envoy/source/extensions/filters/http/rbac/rbac_filter.cc:74] checking request: requestedServerName: outbound_.9080_._.productpage.bookinfo.svc.cluster.local, sourceIP: 10.128.2.12:42356, directRemoteIP: 10.128.2.12:42356, remoteIP: 10.131.0.11:0,localAddress: 10.131.0.26:9080, ssl: uriSanPeerCertificate: spiffe://cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account, dnsSanPeerCertificate: , subjectPeerCertificate: , headers: ':authority', 'istio-ingressgateway-istio-system.apps.myocp.sandbox1249.opentlc.com'
+':path', '/productpage'
+':method', 'GET'
+'user-agent', 'curl/7.71.1'
+'accept', '*/*'
+'x-forwarded-host', 'istio-ingressgateway-istio-system.apps.myocp.sandbox1249.opentlc.com'
+'x-forwarded-port', '80'
+'x-forwarded-proto', 'http'
+'forwarded', 'for=83.159.115.63;host=istio-ingressgateway-istio-system.apps.myocp.sandbox1249.opentlc.com;proto=http'
+'x-forwarded-for', '83.159.115.63,10.131.0.11'
+'x-envoy-external-address', '10.131.0.11'
+'x-request-id', 'bd8791a9-97dc-9b71-bc58-1872d2d05176'
+'x-b3-traceid', '4ced215a910aacddfba570e834bea0cc'
+'x-b3-spanid', 'fba570e834bea0cc'
+'x-b3-sampled', '1'
+'content-length', '0'
+'x-forwarded-client-cert', 'By=spiffe://cluster.local/ns/bookinfo/sa/bookinfo-productpage;Hash=f308b4a5de9a705bd83160872018c7b47e256deadb6f758354132571b81eff55;Subject="";URI=spiffe://cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account'
+, dynamicMetadata: filter_metadata {
+  key: "istio_authn"
+  value {
+    fields {
+      key: "source.namespace"
+      value {
+        string_value: "istio-system"
+      }
+    }
+    fields {
+      key: "source.principal"
+      value {
+        string_value: "cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"
+      }
+    }
+    fields {
+      key: "source.user"
+      value {
+        string_value: "cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"
+      }
+    }
+  }
+}
+
+2021-01-05T15:00:26.746434Z	debug	envoy rbac	[external/envoy/source/extensions/filters/http/rbac/rbac_filter.cc:117] enforced denied
+2021-01-05T15:00:26.746438Z	debug	envoy http	[external/envoy/source/common/http/conn_manager_impl.cc:1479] [C763][S7105721010631031989] Sending local reply with details rbac_access_denied
+

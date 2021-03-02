@@ -1,0 +1,6 @@
+spec:
+  ports:
+  - name: oauth2
+    port: 8081
+    protocol: TCP
+    targetPort: 8081

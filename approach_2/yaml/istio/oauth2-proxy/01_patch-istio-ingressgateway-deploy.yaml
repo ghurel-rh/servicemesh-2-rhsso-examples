@@ -1,0 +1,36 @@
+spec:
+  template:
+    spec:
+      containers:
+      - args:
+        - --provider=keycloak
+        - --client-id=istio
+        - --client-secret=bcd06d5bdd1dbaaf81853d10a66aeb989a38dd51
+        - --login-url=https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab/protocol/openid-connect/auth
+        - --redeem-url=https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab/protocol/openid-connect/token
+        - --validate-url=https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab/protocol/openid-connect/userinfo
+        - --email-domain=*
+        # cookie-secret can be generated using "python2.7 -c 'import os,base64; print base64.urlsafe_b64encode(os.urandom(16))'"
+        # and must then be base64 encoded
+        - --cookie-secret=0dSBdCNa2k1oOPl3eviZ0g==
+        - --skip-provider-button=true
+        - --http-address=0.0.0.0:8081
+        # upstream to forward to istio-proxy container
+        - --upstream=http://127.0.0.1:8080
+        # RHSSO certificate is self-signed 
+        # (better option: mount OCP ingress CA in the pod and use --provider-ca-file)
+        - --ssl-insecure-skip-verify
+        # auto-refresh the cookie every ~1h before it becomes expired
+        - --cookie-expire=1h
+        - --cookie-refresh=55m
+
+        image: quay.io/oauth2-proxy/oauth2-proxy:latest
+        imagePullPolicy: Always
+        name: oauth2-proxy
+        ports:
+        - containerPort: 8081
+          name: oauth-http
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
