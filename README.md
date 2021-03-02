@@ -1,12 +1,17 @@
 # servicemesh-2-rhsso-examples
 
-This repository provides instructions and examples for restricting access to applications deployed in Service Mesh 2.0 to users authenticated/authorized with RHSSO.
+Openshift Service Mesh 2.0 provides an easy way to connect microservices in a secure and consistent manner, and to build distributed, modulable and scalable applications on top of it.
 
-This tutorial assumes a running OCP 4 cluster (>= 4.6) and cluster-admin user are available. 
+Connecting microservices and securing these connections is rather simple thanks to custom ressources such as VirtualService and DestinationRule. But what about securing the access to the resulting applications?
+In an enterprise context, it might be desirable to have some high-level filtering - complementary to network-based filtering - regarding which users or teams can access which applications. 
+
+Istio - the control plane of Openshift Service Mesh 2.0 - provides natively some mechanisms for such filtering, based on a JSON Web Token (JWT) that a user would embed in a cookie when requesting an application. However, the retrieval and the embedding of the JWT is left to the user, and no native mechanism exists yet to provide a full automated workflow.
+
+In this repository, we go through these native authentication/authorization mechanisms, and explore a way to implement a full automated workflow based on OIDC. Red Hat Single Sign-On (RHSSO) is used as the authentication/authorization entity. All the code and more detailed READMEs for each approach are available in the corresponding subdirectories.
+
+This tutorial assumes a running OCP 4 cluster (>= 4.6) and cluster-admin user are available.
 
 For the sake of simplicity, it is better to delete and re-create the istio control plane and the bookinfo application when trying the different approaches below.
-
-See README.md in subdirectories for more details.
 
 ## Prerequisites
 
