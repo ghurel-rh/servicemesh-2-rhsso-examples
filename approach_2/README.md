@@ -35,6 +35,8 @@ istio-ingressgateway-946644c7f-7knb7   2/2     Running   0          48s
 [...]
 ```
 
+**Note:** at the time of writing (2nd of March 2021), the manifest SHA of the used oauth2-proxy image from Quay is `15eaf47e0ca8`. 
+
 ## Redirect Istio Ingress Gateway route to the oauth2-proxy container
 In order to enforce authentication, the default ingress gateway route must now target the oauth2-proxy container instead of the istio-proxy container (which is the original container of the Istio Ingress Gateway pod). Once authenticated, the oauth2-proxy container will forward the request locally to the istio-proxy container since they are in the same pod.
 
