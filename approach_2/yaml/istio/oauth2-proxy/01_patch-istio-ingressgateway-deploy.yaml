@@ -9,6 +9,7 @@ spec:
         - --login-url=https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab/protocol/openid-connect/auth
         - --redeem-url=https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab/protocol/openid-connect/token
         - --validate-url=https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab/protocol/openid-connect/userinfo
+        - --profile-url=https://keycloak-rhsso.apps.<CLUSTERNAME>.<BASEDOMAIN>/auth/realms/servicemesh-lab/protocol/openid-connect/userinfo
         - --email-domain=*
         # cookie-secret can be generated using "python2.7 -c 'import os,base64; print base64.urlsafe_b64encode(os.urandom(16))'"
         # and must then be base64 encoded
@@ -23,7 +24,7 @@ spec:
         # auto-refresh the cookie every ~1h before it becomes expired
         - --cookie-expire=1h
         - --cookie-refresh=55m
-
+        - --scope=openid
         image: quay.io/oauth2-proxy/oauth2-proxy:latest
         imagePullPolicy: Always
         name: oauth2-proxy
